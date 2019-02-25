@@ -1,0 +1,86 @@
+pipeline:
+
+  run-testrunner-tests:
+    image: quay.io/ukhomeofficedigital/tf-testrunner
+    commands:
+      - python -m unittest tests/e2e.py
+    secrets:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+    when:
+      event: push
+
+  init:
+    image: chrisns/docker-terragrunt
+    pull: true
+    commands:
+      - export MOCK_ID=$${AWS_ACCESS_KEY_ID}
+      - export MOCK_KEY=$${AWS_SECRET_ACCESS_KEY}
+      - echo "provider \"aws\" { region = \"eu-west-2\" }" > provider.tf
+      - echo "terraform { backend \"s3\" {} }" > backend.tf
+      - echo "terragrunt = { remote_state { backend = \"s3\"  config {  bucket = \"dacc-dq-test-coral-team\"  region = \"eu-west-2\" dynamodb_table = \"terraform-state\"  key = \"notprod/oag-input-terraform.tfstate\"  encrypt = true  } } }" > terraform.tfvars
+      - terragrunt init
+    when:
+      branch:
+        exclude: [ ]
+    secrets:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+
+  testsuite:
+    image: docker:18.05
+    environment:
+      - DOCKER_HOST=tcp://172.17.0.1:2375
+    commands:
+      - docker run --rm -v $(pwd):/data -w /data hashicorp/terraform fmt --diff --check
+    when:
+      branch:
+        exclude: [ ]
+    secrets:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+
+  validate:
+    image: chrisns/docker-terragrunt
+    commands:
+      - export MOCK_ID=$${TF_VAR_MOCK_ID}
+      - export MOCK_KEY=$${TF_VAR_MOCK_KEY}
+      - terragrunt validate
+    when:
+      branch:
+        exclude: [ ]
+    secrets:
+      - TF_VAR_MOCK_ID
+      - TF_VAR_MOCK_KEY
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+
+  plan:
+    image: chrisns/docker-terragrunt
+    commands:
+      - export MOCK_ID=$${TF_VAR_MOCK_ID}
+      - export MOCK_KEY=$${TF_VAR_MOCK_KEY}
+      - terragrunt plan -lock=false -out=plan
+    when:
+      branch:
+        exclude: [ ]
+    secrets:
+      - TF_VAR_MOCK_ID
+      - TF_VAR_MOCK_KEY
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+
+  apply:
+    image: chrisns/docker-terragrunt
+    commands:
+      - export MOCK_ID=$${TF_VAR_MOCK_ID}
+      - export MOCK_KEY=$${TF_VAR_MOCK_KEY}
+      - terragrunt apply -auto-approve -parallelism=50 plan
+    when:
+      branch:
+        exclude: [ ]
+    secrets:
+      - TF_VAR_MOCK_ID
+      - TF_VAR_MOCK_KEY
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
