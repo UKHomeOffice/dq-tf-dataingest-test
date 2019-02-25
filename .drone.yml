@@ -1,14 +1,14 @@
 pipeline:
 
-  run-testrunner-tests:
-    image: quay.io/ukhomeofficedigital/tf-testrunner
-    commands:
-      - python -m unittest tests/*_test.py
-    secrets:
-      - AWS_ACCESS_KEY_ID
-      - AWS_SECRET_ACCESS_KEY
-    when:
-      event: push
+  #run-testrunner-tests:
+  #  image: quay.io/ukhomeofficedigital/tf-testrunner
+  #  commands:
+  #    - python -m unittest tests/*_test.py
+  #  secrets:
+  #    - AWS_ACCESS_KEY_ID
+  #    - AWS_SECRET_ACCESS_KEY
+  #  when:
+  #    event: push
 
   init:
     image: chrisns/docker-terragrunt
