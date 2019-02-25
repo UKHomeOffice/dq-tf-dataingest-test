@@ -3,7 +3,7 @@ pipeline:
   run-testrunner-tests:
     image: quay.io/ukhomeofficedigital/tf-testrunner
     commands:
-      - python -m unittest tests/e2e.py
+      - python -m unittest tests/di-test.py
     secrets:
       - AWS_ACCESS_KEY_ID
       - AWS_SECRET_ACCESS_KEY
