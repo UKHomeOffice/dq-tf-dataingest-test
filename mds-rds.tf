@@ -53,13 +53,13 @@ resource "random_string" "mds_password" {
 resource "aws_ssm_parameter" "mds_username" {
   name  = "mds_username"
   type  = "SecureString"
-  value = "${random_string.username.result}"
+  value = "${random_string.mds_username.result}"
 }
 
 resource "aws_ssm_parameter" "mds_password" {
   name  = "mds_password"
   type  = "SecureString"
-  value = "${random_string.password.result}"
+  value = "${random_string.mds_password.result}"
 }
 
 resource "aws_db_instance" "mds_mssql_2012" {
