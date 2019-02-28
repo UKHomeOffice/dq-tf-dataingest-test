@@ -27,3 +27,7 @@ output "di_connectivity_tester_db_ip" {
 #output "data_landing_bucket_key_arn" {
 #  value = "${aws_kms_key.data_landing_bucket_key.arn}"
 #}
+
+output "rds_mds_address" {
+  value = "${aws_db_instance.mds_mssql_2012.address}"
+}
