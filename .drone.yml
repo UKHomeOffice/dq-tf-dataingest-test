@@ -18,7 +18,7 @@ pipeline:
       - export MOCK_KEY=$${AWS_SECRET_ACCESS_KEY}
       - echo "provider \"aws\" { region = \"eu-west-2\" }" > provider.tf
       - echo "terraform { backend \"s3\" {} }" > backend.tf
-      - echo "terragrunt = { remote_state { backend = \"s3\"  config {  bucket = \"dacc-dq-test-coral-team\"  region = \"eu-west-2\" dynamodb_table = \"terraform-state\"  key = \"notprod/oag-input-terraform.tfstate\"  encrypt = true  } } }" > terraform.tfvars
+      - echo "terragrunt = { remote_state { backend = \"s3\"  config {  bucket = \"dacc-dq-test-coral-team\"  region = \"eu-west-2\" dynamodb_table = \"terraform-state\"  key = \"notprod/dataingest-terraform.tfstate\"  encrypt = true  } } }" > terraform.tfvars
       - terragrunt init
     when:
       branch:
